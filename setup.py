@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-sentry-ldap-auth
-==============
+sentry-auth-ldap
+================
 
 An extension for Sentry which authenticates users from
 an LDAP server and auto-adds them to the an organization in sentry.
@@ -12,16 +12,16 @@ with open("README.md", "r") as readme:
     long_description = readme.read()
 
 install_requires = [
-    'django-auth-ldap==1.2.*',
-    'sentry>=8.0.0',
+    'django-auth-ldap==3.0.0',
+    'sentry>=21.9.0',
 ]
 
 setup(
-    name='sentry-ldap-auth',
-    version='2.8.1',
-    author='Chad Killingsworth <chad.killingsworth@banno.com>, Barron Hagerman <barron.hagerman@banno.com>',
-    author_email='chad.killingsworth@banno.com',
-    url='http://github.com/banno/getsentry-ldap-auth',
+    name='sentry-auth-ldap',
+    version='21.9.1',
+    author='Chad Killingsworth <chad.killingsworth@banno.com>, Barron Hagerman <barron.hagerman@banno.com>, PM Extra <pm@jubeat.net>',
+    author_email='pm@jubeat.net',
+    url='http://github.com/PMExtra/sentry-auth-ldap',
     description='A Sentry extension to add an LDAP server as an authentication source.',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -30,12 +30,18 @@ setup(
     zip_safe=False,
     install_requires=install_requires,
     include_package_data=True,
-    download_url='https://github.com/banno/getsentry-ldap-auth/tarball/2.8.1',
+    download_url='http://github.com/PMExtra/sentry-auth-ldap',
     classifiers=[
         'Framework :: Django',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3',
         'Topic :: Software Development'
     ],
+    project_urls={
+        'Bug Tracker': 'http://github.com/PMExtra/sentry-auth-ldap/issues',
+        'CI': 'http://github.com/PMExtra/sentry-auth-ldap/actions',
+        'Source Code': 'http://github.com/PMExtra/sentry-auth-ldap',
+    },
 )

@@ -1,4 +1,4 @@
-# sentry-ldap-auth
+# sentry-auth-ldap
 
 A Django custom authentication backend for [Sentry](https://github.com/getsentry/sentry). This module extends the functionality of [django-auth-ldap](https://github.com/django-auth-ldap/django-auth-ldap) with Sentry specific features.
 
@@ -7,10 +7,10 @@ A Django custom authentication backend for [Sentry](https://github.com/getsentry
 * Users may be auto-added to an Organization upon creation.
 
 ## Prerequisites
-Versions 2.0 and newer require Sentry 8. For Sentry 7 support, use [the 1.1 release](https://github.com/Banno/getsentry-ldap-auth/releases/tag/1.1)
+Versions 21.9.x require Sentry 21.9.0+. For older Sentry support, use [sentry-ldap-auth](https://github.com/Banno/getsentry-ldap-auth)
 
 ## Installation
-To install, simply add `sentry-ldap-auth` to your *requirements.txt* for your Sentry environment (or `pip install sentry-ldap-auth`).
+To install, simply add `sentry-auth-ldap` to your *requirements.txt* for your Sentry environment (or `pip install sentry-auth-ldap`).
 
 ## Configuration
 This module extends the [django-auth-ldap](https://django-auth-ldap.readthedocs.io/en/latest/) and all the options it provides are supported (up to v1.2.x, at least). 
@@ -19,13 +19,13 @@ To configure Sentry to use this module, add `sentry_ldap_auth.backend.SentryLdap
 
 ```python
 AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (
-    'sentry_ldap_auth.backend.SentryLdapBackend',
+    'sentry_auth_ldap.backend.SentryLdapBackend',
 )
 ```
 
 Then, add any applicable configuration options. Depending on your environment, and especially if you are running Sentry in containers, you might consider using [python-decouple](https://pypi.python.org/pypi/python-decouple) so you can set these options via environment variables.
 
-### sentry-ldap-auth Specific Options
+### sentry-auth-ldap Specific Options
 
 ```Python
 AUTH_LDAP_DEFAULT_SENTRY_ORGANIZATION = u'My Organization Name'
@@ -41,7 +41,7 @@ Role type auto-added users are assigned. Valid values in a default installation 
 AUTH_LDAP_SENTRY_ORGANIZATION_GLOBAL_ACCESS = True
 ```
 Whether auto-created users should be granted global access within the default organization.
- 
+
 ```Python
 AUTH_LDAP_SENTRY_SUBSCRIBE_BY_DEFAULT = False
 ```
@@ -50,15 +50,13 @@ this is useful for large organizations where a subscription to each project
 might be spammy.
 
 ```Python
-AUTH_LDAP_SENTRY_USERNAME_FIELD = 'uid'
-```
-Specify which attribute to use as the Sentry username, if different from what the user enters on the login page. You can use this to prevent multiple accounts from being created when your `AUTH_LDAP_USER_SEARCH` allows users to log in with different usernames (e.g. `(|(uid=%(user))(mail=%(user)))`). If multiple values exist for the attribute, the first value will be used.
-
-```Python
 AUTH_LDAP_DEFAULT_EMAIL_DOMAIN = 'example.com'
 ```
 Default domain to append to username as the Sentry user's e-mail address when the LDAP user has no `mail` attribute.
- 
+
+> **WARNING**: There is an obsoleted setting named `AUTH_LDAP_SENTRY_USERNAME_FIELD`.  
+> It could be replaced by `AUTH_LDAP_USER_QUERY_FIELD` and `AUTH_LDAP_USER_ATTR_MAP` which django-auth-ldap built-in.
+
 ### Sentry Options
 
 ```Python
@@ -76,6 +74,7 @@ from django_auth_ldap.config import LDAPSearch, GroupOfUniqueNamesType
 AUTH_LDAP_SERVER_URI = 'ldap://my.ldapserver.com'
 AUTH_LDAP_BIND_DN = ''
 AUTH_LDAP_BIND_PASSWORD = ''
+AUTH_LDAP_USER_QUERY_FIELD = 'username'
 
 AUTH_LDAP_USER_SEARCH = LDAPSearch(
     'dc=domain,dc=com',
@@ -94,6 +93,7 @@ AUTH_LDAP_REQUIRE_GROUP = None
 AUTH_LDAP_DENY_GROUP = None
 
 AUTH_LDAP_USER_ATTR_MAP = {
+    'username': 'uid',
     'name': 'cn',
     'email': 'mail'
 }
@@ -110,7 +110,6 @@ AUTH_LDAP_SENTRY_GROUP_ROLE_MAPPING = {
     'member': ['developers', 'seniordevelopers']
 }
 AUTH_LDAP_SENTRY_ORGANIZATION_GLOBAL_ACCESS = True
-AUTH_LDAP_SENTRY_USERNAME_FIELD = 'uid'
 
 AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (
     'sentry_ldap_auth.backend.SentryLdapBackend',

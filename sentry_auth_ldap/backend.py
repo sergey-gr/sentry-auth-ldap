@@ -55,6 +55,10 @@ class SentryLdapBackend(LDAPBackend):
 
             if email:
                 user.email = email
+            
+            user.save()
+
+            if email:
                 UserEmail.objects.get_or_create(user=user, email=email)
 
         # Check to see if we need to add the user to an organization

@@ -15,7 +15,7 @@ To install, simply add `sentry-auth-ldap` to your *requirements.txt* for your Se
 ## Configuration
 This module extends the [django-auth-ldap](https://django-auth-ldap.readthedocs.io/en/latest/) and all the options it provides are supported (up to v1.2.x, at least). 
 
-To configure Sentry to use this module, add `sentry_ldap_auth.backend.SentryLdapBackend` to your `AUTHENTICATION_BACKENDS` in your *sentry.conf.py*, like this:
+To configure Sentry to use this module, add `sentry_auth_ldap.backend.SentryLdapBackend` to your `AUTHENTICATION_BACKENDS` in your *sentry.conf.py*, like this:
 
 ```python
 AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (
@@ -112,7 +112,7 @@ AUTH_LDAP_SENTRY_GROUP_ROLE_MAPPING = {
 AUTH_LDAP_SENTRY_ORGANIZATION_GLOBAL_ACCESS = True
 
 AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (
-    'sentry_ldap_auth.backend.SentryLdapBackend',
+    'sentry_auth_ldap.backend.SentryLdapBackend',
 )
 
 import logging

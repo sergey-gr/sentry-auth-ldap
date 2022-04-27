@@ -4,7 +4,7 @@ sentry-auth-ldap
 ================
 
 An extension for Sentry which authenticates users from
-an LDAP server and auto-adds them to the an organization in sentry.
+an LDAP server and auto-adds them to an organization in sentry.
 """
 from setuptools import setup, find_packages
 
@@ -18,10 +18,10 @@ install_requires = [
 
 setup(
     name='sentry-auth-ldap',
-    version='21.9.1',
+    version='21.9.2',
     author='Chad Killingsworth <chad.killingsworth@banno.com>, Barron Hagerman <barron.hagerman@banno.com>, PM Extra <pm@jubeat.net>',
     author_email='pm@jubeat.net',
-    url='http://github.com/PMExtra/sentry-auth-ldap',
+    url='https://github.com/PMExtra/sentry-auth-ldap',
     description='A Sentry extension to add an LDAP server as an authentication source.',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -30,7 +30,7 @@ setup(
     zip_safe=False,
     install_requires=install_requires,
     include_package_data=True,
-    download_url='http://github.com/PMExtra/sentry-auth-ldap',
+    download_url='https://github.com/PMExtra/sentry-auth-ldap',
     classifiers=[
         'Framework :: Django',
         'Intended Audience :: Developers',
@@ -40,8 +40,8 @@ setup(
         'Topic :: Software Development'
     ],
     project_urls={
-        'Bug Tracker': 'http://github.com/PMExtra/sentry-auth-ldap/issues',
-        'CI': 'http://github.com/PMExtra/sentry-auth-ldap/actions',
-        'Source Code': 'http://github.com/PMExtra/sentry-auth-ldap',
+        'Bug Tracker': 'https://github.com/PMExtra/sentry-auth-ldap/issues',
+        'CI': 'https://github.com/PMExtra/sentry-auth-ldap/actions',
+        'Source Code': 'https://github.com/PMExtra/sentry-auth-ldap',
     },
 )

@@ -1,5 +1,8 @@
 # sentry-auth-ldap
 
+[![](https://img.shields.io/pypi/v/sentry-auth-ldap.svg)](https://pypi.org/project/sentry-auth-ldap/)
+[![](https://img.shields.io/pypi/l/sentry-auth-ldap.svg)](https://raw.githubusercontent.com/PMExtra/sentry-auth-ldap/master/LICENSE.txt)
+
 A Django custom authentication backend for [Sentry](https://github.com/getsentry/sentry). This module extends the functionality of [django-auth-ldap](https://github.com/django-auth-ldap/django-auth-ldap) with Sentry specific features.
 
 ## Features
@@ -115,8 +118,27 @@ AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (
     'sentry_auth_ldap.backend.SentryLdapBackend',
 )
 
+# Optional logging for diagnostics.
+# Make sure LOGGING.disable_existing_loggers is False (in sentry/conf/server.py)
 import logging
 logger = logging.getLogger('django_auth_ldap')
-logger.addHandler(logging.StreamHandler())
 logger.setLevel('DEBUG')
 ```
+
+### Troubleshooting
+
+#### Work with LDAPS protocol (SSL/TLS)
+
+Put the below content into /etc/ldap/ldap.conf, otherwise the certificate won't be trusted.
+
+```plain
+TLS_CACERT /etc/ssl/certs/ca-certificates.crt
+```
+
+If your certificate was issued by a private CA, you should change the path.
+
+#### Don't use OCSP-Must-Staple certificate (SSL/TLS)
+
+Please don't use [OCSP-Must-Staple](https://oid-info.com/get/1.3.6.1.5.5.7.1.24) certificate with LDAPS.
+
+Some ldap servers (eg. OpenLDAP) don't support stapling OCSP response. So it will cause the handshake failed.

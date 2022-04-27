@@ -55,7 +55,7 @@ class SentryLdapBackend(LDAPBackend):
 
             if email:
                 user.email = email
-            
+
             user.save()
 
             if email:

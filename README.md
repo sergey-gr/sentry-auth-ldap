@@ -1,7 +1,8 @@
 # sentry-auth-ldap
 
-[![](https://img.shields.io/pypi/v/sentry-auth-ldap.svg)](https://pypi.org/project/sentry-auth-ldap/)
-[![](https://img.shields.io/pypi/l/sentry-auth-ldap.svg)](https://raw.githubusercontent.com/PMExtra/sentry-auth-ldap/master/LICENSE.txt)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/PMExtra/sentry-auth-ldap/sentry-auth-ldap%20CI)](https://github.com/PMExtra/sentry-auth-ldap/actions)
+[![PyPI](https://img.shields.io/pypi/v/sentry-auth-ldap)](https://pypi.org/project/sentry-auth-ldap/)
+[![License](https://img.shields.io/pypi/l/sentry-auth-ldap)](https://raw.githubusercontent.com/PMExtra/sentry-auth-ldap/master/LICENSE.txt)
 
 A Django custom authentication backend for [Sentry](https://github.com/getsentry/sentry). This module extends the functionality of [django-auth-ldap](https://github.com/django-auth-ldap/django-auth-ldap) with Sentry specific features.
 
@@ -10,10 +11,36 @@ A Django custom authentication backend for [Sentry](https://github.com/getsentry
 * Users may be auto-added to an Organization upon creation.
 
 ## Prerequisites
-Versions 21.9.x require Sentry 21.9.0+. For older Sentry support, use [sentry-ldap-auth](https://github.com/Banno/getsentry-ldap-auth)
+Plugin 21.9.x support Sentry 21.9.0 or higher. For legacy Sentry support, you can use another project [sentry-ldap-auth](https://github.com/Banno/getsentry-ldap-auth)
 
 ## Installation
 To install, simply add `sentry-auth-ldap` to your *requirements.txt* for your Sentry environment (or `pip install sentry-auth-ldap`).
+
+For container environment, because of the minimal base image, it may miss some dependencies.
+
+You can easily enhance the image by `sentry/enhance-image.sh` script (need [getsentry/self-hosted](https://github.com/getsentry/self-hosted) 22.6.0 or higher):
+
+```Shell
+#!/bin/bash
+
+requirements=(
+sentry-auth-ldap>=21.9.0
+# You can add other packages here, just like requirements.txt
+)
+
+# Install the dependencies of ldap
+apt-get update
+apt-get install -y --no-install-recommends build-essential libldap2-dev libsasl2-dev
+
+pip install ${requirements[@]}
+
+# Clean up to shrink the image size
+apt-get purge -y --auto-remove build-essential
+rm -rf /var/lib/apt/lists/*
+
+# Support ldap over tls (ldaps://) protocol
+mkdir -p /etc/ldap && echo "TLS_CACERT /etc/ssl/certs/ca-certificates.crt" > /etc/ldap/ldap.conf
+```
 
 ## Configuration
 This module extends the [django-auth-ldap](https://django-auth-ldap.readthedocs.io/en/latest/) and all the options it provides are supported (up to v1.2.x, at least). 
@@ -119,10 +146,10 @@ AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (
 )
 
 # Optional logging for diagnostics.
-# Make sure LOGGING.disable_existing_loggers is False (in sentry/conf/server.py)
+# Make sure LOGGING.disable_existing_loggers is set to False (in sentry/conf/server.py)
 import logging
 logger = logging.getLogger('django_auth_ldap')
-logger.setLevel('DEBUG')
+logger.setLevel(logging.DEBUG)
 ```
 
 ### Troubleshooting

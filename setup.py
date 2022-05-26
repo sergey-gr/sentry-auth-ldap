@@ -6,7 +6,7 @@ sentry-auth-ldap
 An extension for Sentry which authenticates users from
 an LDAP server and auto-adds them to an organization in sentry.
 """
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 with open("README.md", "r") as readme:
     long_description = readme.read()
@@ -25,7 +25,7 @@ setup(
     description='A Sentry extension to add an LDAP server as an authentication source.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    packages=find_packages(),
+    packages=find_namespace_packages(),
     license='Apache-2.0',
     zip_safe=False,
     install_requires=install_requires,

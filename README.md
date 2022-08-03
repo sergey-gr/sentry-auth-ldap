@@ -24,7 +24,7 @@ You can easily enhance the image by `sentry/enhance-image.sh` script (need [gets
 #!/bin/bash
 
 requirements=(
-sentry-auth-ldap>=21.9.0
+'sentry-auth-ldap>=21.9.0'
 # You can add other packages here, just like requirements.txt
 )
 

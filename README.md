@@ -1,6 +1,6 @@
 # sentry-auth-ldap
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/PMExtra/sentry-auth-ldap/sentry-auth-ldap%20CI)](https://github.com/PMExtra/sentry-auth-ldap/actions)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/PMExtra/sentry-auth-ldap/publish.yaml)](https://github.com/PMExtra/sentry-auth-ldap/actions)
 [![PyPI](https://img.shields.io/pypi/v/sentry-auth-ldap)](https://pypi.org/project/sentry-auth-ldap/)
 [![License](https://img.shields.io/pypi/l/sentry-auth-ldap)](https://raw.githubusercontent.com/PMExtra/sentry-auth-ldap/master/LICENSE.txt)
 

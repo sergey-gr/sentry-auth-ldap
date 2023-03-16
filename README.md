@@ -112,6 +112,14 @@ AUTH_LDAP_USER_SEARCH = LDAPSearch(
     '(mail=%(user)s)',
 )
 
+AUTH_LDAP_USER_ATTR_MAP = {
+    'username': 'uid',
+    'name': 'cn',
+    'email': 'mail'
+}
+
+AUTH_LDAP_MAIL_VERIFIED = True
+
 AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
     '',
     ldap.SCOPE_SUBTREE,
@@ -121,18 +129,11 @@ AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
 AUTH_LDAP_GROUP_TYPE = GroupOfUniqueNamesType()
 AUTH_LDAP_REQUIRE_GROUP = None
 AUTH_LDAP_DENY_GROUP = None
-
-AUTH_LDAP_USER_ATTR_MAP = {
-    'username': 'uid',
-    'name': 'cn',
-    'email': 'mail'
-}
-
 AUTH_LDAP_FIND_GROUP_PERMS = False
 AUTH_LDAP_CACHE_GROUPS = True
 AUTH_LDAP_GROUP_CACHE_TIMEOUT = 3600
 
-AUTH_LDAP_DEFAULT_SENTRY_ORGANIZATION = u'My Organization Name'
+AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION = 'organization-slug'
 AUTH_LDAP_SENTRY_ORGANIZATION_ROLE_TYPE = 'member'
 AUTH_LDAP_SENTRY_GROUP_ROLE_MAPPING = {
     'owner': ['sysadmins'],

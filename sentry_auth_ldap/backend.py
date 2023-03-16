@@ -1,6 +1,5 @@
 from django_auth_ldap.backend import LDAPBackend
 from django.conf import settings
-from django.db.models import Q
 from sentry.models import (
     Organization,
     OrganizationMember,
@@ -45,7 +44,8 @@ class SentryLdapBackend(LDAPBackend):
         except ImportError:
             pass
         else:
-            mail_attr = ldap_user.attrs.get('mail')
+            mail_attr_name = self.settings.USER_ATTR_MAP.get('email', 'mail')
+            mail_attr = ldap_user.attrs.get(mail_attr_name)
             if mail_attr:
                 email = mail_attr[0]
             elif hasattr(settings, 'AUTH_LDAP_DEFAULT_EMAIL_DOMAIN'):
@@ -58,15 +58,25 @@ class SentryLdapBackend(LDAPBackend):
 
             user.save()
 
-            if email:
-                UserEmail.objects.get_or_create(user=user, email=email)
+            if mail_attr:
+                is_verified = getattr(settings, 'AUTH_LDAP_MAIL_VERIFIED', False)
+                for email in mail_attr:
+                    UserEmail.objects.create(user=user, email=email, is_verified=is_verified)
+            elif email:
+                UserEmail.objects.create(user=user, email=email)
 
         # Check to see if we need to add the user to an organization
-        if not settings.AUTH_LDAP_DEFAULT_SENTRY_ORGANIZATION:
-            return (user, built)
+        organization_slug = getattr(settings, 'AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION', None)
+        # For backward compatibility
+        organization_name = getattr(settings, 'AUTH_LDAP_DEFAULT_SENTRY_ORGANIZATION', None)
 
         # Find the default organization
-        organizations = Organization.objects.filter(name=settings.AUTH_LDAP_DEFAULT_SENTRY_ORGANIZATION)
+        if organization_slug:
+            organizations = Organization.objects.filter(slug=organization_slug)
+        elif organization_name:
+            organizations = Organization.objects.filter(name=organization_name)
+        else:
+            return (user, built)
 
         if not organizations or len(organizations) < 1:
             return (user, built)

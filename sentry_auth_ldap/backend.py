@@ -8,7 +8,7 @@ from sentry.models import (
 )
 
 
-def _get_effective_sentry_role(group_names):
+def _get_effective_sentry_role(ldap_user):
     role_priority_order = [
         'member',
         'admin',
@@ -17,17 +17,18 @@ def _get_effective_sentry_role(group_names):
     ]
 
     role_mapping = getattr(settings, 'AUTH_LDAP_SENTRY_GROUP_ROLE_MAPPING', None)
+    if not role_mapping:
+        return None
 
-    if not group_names or not role_mapping:
+    group_names = ldap_user.group_names
+    if not group_names:
         return None
 
     applicable_roles = [role for role, groups in role_mapping.items() if group_names.intersection(groups)]
-
     if not applicable_roles:
         return None
 
     highest_role = [role for role in role_priority_order if role in applicable_roles][-1]
-
     return highest_role
 
 
@@ -79,9 +80,7 @@ class SentryLdapBackend(LDAPBackend):
         if not organizations or len(organizations) < 1:
             return (user, built)
 
-        member_role = _get_effective_sentry_role(ldap_user.group_names)
-        if not member_role:
-            member_role = getattr(settings, 'AUTH_LDAP_SENTRY_ORGANIZATION_ROLE_TYPE', None)
+        member_role = _get_effective_sentry_role(ldap_user) or getattr(settings, 'AUTH_LDAP_SENTRY_ORGANIZATION_ROLE_TYPE', None)
 
         has_global_access = getattr(settings, 'AUTH_LDAP_SENTRY_ORGANIZATION_GLOBAL_ACCESS', False)
 

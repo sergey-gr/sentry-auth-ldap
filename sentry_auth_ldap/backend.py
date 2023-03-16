@@ -3,6 +3,7 @@ from django.conf import settings
 from sentry.models import (
     Organization,
     OrganizationMember,
+    UserEmail,
     UserOption,
 )
 
@@ -33,37 +34,34 @@ def _get_effective_sentry_role(group_names):
 class SentryLdapBackend(LDAPBackend):
     def get_or_build_user(self, username, ldap_user):
         (user, built) = super().get_or_build_user(username, ldap_user)
-        if not built:
-            return (user, built)
 
         user.is_managed = True
 
         # Add the user email address
-        try:
-            from sentry.models import (UserEmail)
-        except ImportError:
-            pass
+        mail_attr_name = self.settings.USER_ATTR_MAP.get('email', 'mail')
+        mail_attr = ldap_user.attrs.get(mail_attr_name)
+        if mail_attr:
+            email = mail_attr[0]
+        elif hasattr(settings, 'AUTH_LDAP_DEFAULT_EMAIL_DOMAIN'):
+            email = username + '@' + settings.AUTH_LDAP_DEFAULT_EMAIL_DOMAIN
         else:
-            mail_attr_name = self.settings.USER_ATTR_MAP.get('email', 'mail')
-            mail_attr = ldap_user.attrs.get(mail_attr_name)
-            if mail_attr:
-                email = mail_attr[0]
-            elif hasattr(settings, 'AUTH_LDAP_DEFAULT_EMAIL_DOMAIN'):
-                email = username + '@' + settings.AUTH_LDAP_DEFAULT_EMAIL_DOMAIN
-            else:
-                email = None
+            email = None
 
-            if email:
-                user.email = email
+        if email:
+            user.email = email
 
-            user.save()
+        user.save()
 
-            if mail_attr:
-                is_verified = getattr(settings, 'AUTH_LDAP_MAIL_VERIFIED', False)
-                for email in mail_attr:
-                    UserEmail.objects.create(user=user, email=email, is_verified=is_verified)
-            elif email:
-                UserEmail.objects.create(user=user, email=email)
+        if mail_attr and getattr(settings, 'AUTH_LDAP_MAIL_VERIFIED', False):
+            defaults = { 'is_verified': True }
+        else:
+            defaults = None
+
+        for mail in mail_attr or [email]:
+            UserEmail.objects.update_or_create(defaults = defaults, user=user, email=mail)
+
+        if not built:
+            return (user, built)
 
         # Check to see if we need to add the user to an organization
         organization_slug = getattr(settings, 'AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION', None)

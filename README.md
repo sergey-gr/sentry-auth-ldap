@@ -147,7 +147,7 @@ AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (
 )
 
 # Optional logging for diagnostics.
-# Make sure LOGGING.disable_existing_loggers is set to False (in sentry/conf/server.py)
+LOGGING['disable_existing_loggers'] = False
 import logging
 logger = logging.getLogger('django_auth_ldap')
 logger.setLevel(logging.DEBUG)

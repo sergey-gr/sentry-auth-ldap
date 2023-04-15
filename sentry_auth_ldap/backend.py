@@ -71,7 +71,7 @@ class SentryLdapBackend(LDAPBackend):
             organizations = Organization.objects.filter(slug=organization_slug)
         elif organization_name:
             organizations = Organization.objects.filter(name=organization_name)
-        
+
         if not organizations or len(organizations) < 1:
             return (user, built)
 
@@ -84,9 +84,9 @@ class SentryLdapBackend(LDAPBackend):
             organization=organizations[0],
             user=user,
             defaults={
-                    'role': member_role,
-                    'has_global_access': has_global_access,
-                    'flags': getattr(OrganizationMember.flags, 'sso:linked')
+                'role': member_role,
+                'has_global_access': has_global_access,
+                'flags': getattr(OrganizationMember.flags, 'sso:linked')
             }
         )
 

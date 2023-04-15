@@ -61,9 +61,6 @@ class SentryLdapBackend(LDAPBackend):
         for mail in mail_attr or [email]:
             UserEmail.objects.update_or_create(defaults = defaults, user=user, email=mail)
 
-        if not built:
-            return (user, built)
-
         # Check to see if we need to add the user to an organization
         organization_slug = getattr(settings, 'AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION', None)
         # For backward compatibility
@@ -74,8 +71,6 @@ class SentryLdapBackend(LDAPBackend):
             organizations = Organization.objects.filter(slug=organization_slug)
         elif organization_name:
             organizations = Organization.objects.filter(name=organization_name)
-        else:
-            return (user, built)
 
         if not organizations or len(organizations) < 1:
             return (user, built)
@@ -85,12 +80,14 @@ class SentryLdapBackend(LDAPBackend):
         has_global_access = getattr(settings, 'AUTH_LDAP_SENTRY_ORGANIZATION_GLOBAL_ACCESS', False)
 
         # Add the user to the organization with global access
-        OrganizationMember.objects.create(
+        OrganizationMember.objects.update_or_create(
             organization=organizations[0],
             user=user,
-            role=member_role,
-            has_global_access=has_global_access,
-            flags=getattr(OrganizationMember.flags, 'sso:linked'),
+            defaults={
+                'role': member_role,
+                'has_global_access': has_global_access,
+                'flags': getattr(OrganizationMember.flags, 'sso:linked')
+            }
         )
 
         if not getattr(settings, 'AUTH_LDAP_SENTRY_SUBSCRIBE_BY_DEFAULT', True):

@@ -71,6 +71,8 @@ class SentryLdapBackend(LDAPBackend):
             organizations = Organization.objects.filter(slug=organization_slug)
         elif organization_name:
             organizations = Organization.objects.filter(name=organization_name)
+        else:
+            return (user, built)
 
         if not organizations or len(organizations) < 1:
             return (user, built)

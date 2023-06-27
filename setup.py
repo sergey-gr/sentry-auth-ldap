@@ -13,12 +13,12 @@ with open("README.md", "r") as readme:
 
 install_requires = [
     'django-auth-ldap==4.1.0',
-    'sentry>=21.9.0',
+    'sentry>=23.6.0',
 ]
 
 setup(
     name='sentry-auth-ldap',
-    version='21.9.11',
+    version='23.6.0',
     author='Chad Killingsworth <chad.killingsworth@banno.com>, Barron Hagerman <barron.hagerman@banno.com>, PM Extra <pm@jubeat.net>',
     author_email='pm@jubeat.net',
     url='https://github.com/PMExtra/sentry-auth-ldap',

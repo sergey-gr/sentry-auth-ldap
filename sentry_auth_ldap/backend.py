@@ -32,6 +32,19 @@ def _get_effective_sentry_role(ldap_user):
     return highest_role
 
 
+def _find_default_organization():
+    organization_slug = getattr(settings, 'AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION', None)
+    if organization_slug:
+        return Organization.objects.filter(slug=organization_slug).first()
+
+    # For backward compatibility
+    organization_name = getattr(settings, 'AUTH_LDAP_DEFAULT_SENTRY_ORGANIZATION', None)
+    if organization_name:
+        return Organization.objects.filter(name=organization_name).first()
+
+    return None
+
+
 class SentryLdapBackend(LDAPBackend):
     def get_or_build_user(self, username, ldap_user):
         (user, built) = super().get_or_build_user(username, ldap_user)
@@ -59,40 +72,29 @@ class SentryLdapBackend(LDAPBackend):
             defaults = None
 
         for mail in mail_attr or [email]:
-            UserEmail.objects.update_or_create(defaults = defaults, user=user, email=mail)
+            UserEmail.objects.update_or_create(defaults=defaults, user=user, email=mail)
 
-        # Check to see if we need to add the user to an organization
-        organization_slug = getattr(settings, 'AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION', None)
-        # For backward compatibility
-        organization_name = getattr(settings, 'AUTH_LDAP_DEFAULT_SENTRY_ORGANIZATION', None)
+        organization = _find_default_organization()
+        if organization:
+            sentry_role_from_ldap_group = _get_effective_sentry_role(ldap_user)
+            try:
+                organization_member = OrganizationMember.objects.get(organization=organization, user_id=user.id)
+                if sentry_role_from_ldap_group:
+                    # The role mapped from LDAP will always overrides any manual changes the user might have made
+                    organization_member.role = sentry_role_from_ldap_group
+                    organization_member.save()
+            except OrganizationMember.DoesNotExist:
+                # Assign the user to the organization if not exists
+                OrganizationMember.objects.create(
+                    organization=organization,
+                    user_id=user.id,
+                    role=sentry_role_from_ldap_group or getattr(settings, 'AUTH_LDAP_SENTRY_ORGANIZATION_ROLE_TYPE', None),
+                    has_global_access=getattr(settings, 'AUTH_LDAP_SENTRY_ORGANIZATION_GLOBAL_ACCESS', False),
+                    flags=getattr(OrganizationMember.flags, 'sso:linked'),
+                )
 
-        # Find the default organization
-        if organization_slug:
-            organizations = Organization.objects.filter(slug=organization_slug)
-        elif organization_name:
-            organizations = Organization.objects.filter(name=organization_name)
-        else:
-            return (user, built)
-
-        if not organizations or len(organizations) < 1:
-            return (user, built)
-
-        member_role = _get_effective_sentry_role(ldap_user) or getattr(settings, 'AUTH_LDAP_SENTRY_ORGANIZATION_ROLE_TYPE', None)
-
-        has_global_access = getattr(settings, 'AUTH_LDAP_SENTRY_ORGANIZATION_GLOBAL_ACCESS', False)
-
-        # Add the user to the organization with global access
-        OrganizationMember.objects.update_or_create(
-            organization=organizations[0],
-            user_id=user.id,
-            defaults={
-                'role': member_role,
-                'has_global_access': has_global_access,
-                'flags': getattr(OrganizationMember.flags, 'sso:linked')
-            }
-        )
-
-        if not getattr(settings, 'AUTH_LDAP_SENTRY_SUBSCRIBE_BY_DEFAULT', True):
+        # Set subscribe_by_default for new user
+        if built and not getattr(settings, 'AUTH_LDAP_SENTRY_SUBSCRIBE_BY_DEFAULT', True):
             UserOption.objects.set_value(
                 user=user,
                 project=None,

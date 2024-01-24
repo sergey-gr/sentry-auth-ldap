@@ -60,7 +60,7 @@ Then, add any applicable configuration options. Depending on your environment, a
 ### sentry-auth-ldap Specific Options
 
 ```Python
-AUTH_LDAP_DEFAULT_SENTRY_ORGANIZATION = u'My Organization Name'
+AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION = 'organization-slug'
 ```
 Auto adds created user to the specified organization (matched by name) if it exists.
 

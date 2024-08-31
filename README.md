@@ -64,6 +64,9 @@ AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION = 'organization-slug'
 ```
 Auto adds created user to the specified organization (matched by name) if it exists.
 
+> **WARNING**: There is an obsoleted setting named `SENTRY_LDAP_DEFAULT_SENTRY_ORGANIZATION`.
+> It's used to set the default organization by display name, which is an unsuitable identifier.
+
 ```Python
 AUTH_LDAP_SENTRY_ORGANIZATION_ROLE_TYPE = 'member'
 ```

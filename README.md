@@ -60,7 +60,7 @@ Then, add any applicable configuration options. Depending on your environment, a
 ### sentry-auth-ldap Specific Options
 
 ```Python
-AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION = 'organization-slug'
+AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION = 'your-organization-slug'
 ```
 Auto adds created user to the specified organization (matched by name) if it exists.
 
@@ -138,7 +138,7 @@ AUTH_LDAP_FIND_GROUP_PERMS = False
 AUTH_LDAP_CACHE_GROUPS = True
 AUTH_LDAP_GROUP_CACHE_TIMEOUT = 3600
 
-AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION = 'organization-slug'
+AUTH_LDAP_SENTRY_DEFAULT_ORGANIZATION = 'your-organization-slug'
 AUTH_LDAP_SENTRY_ORGANIZATION_ROLE_TYPE = 'member'
 AUTH_LDAP_SENTRY_GROUP_ROLE_MAPPING = {
     'owner': ['sysadmins'],

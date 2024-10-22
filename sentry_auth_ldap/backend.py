@@ -4,23 +4,22 @@ from django.conf import settings
 from packaging import version
 from sentry import __version__ as sentry_version
 
-def compare_versions(current: str) -> bool:
-    return version.parse(current) > version.parse("24.7.1")
+def compare_versions(current: str, required: str) -> bool:
+    """
+    Compare two version strings.
 
-if compare_versions(sentry_version):
-    from sentry.models import (
-        Organization,
-        OrganizationMember,
-        UserOption,
-    )
+    :param current: The current version string
+    :param required: The required version string
+    :return: True if the current version is greater than the required version, otherwise False
+    """
+    return version.parse(current) > version.parse(required)
+
+# Import different models for backwards compatibility
+if compare_versions(sentry_version, "24.7.1"):
+    from sentry.models import Organization, OrganizationMember, UserOption
     from sentry.users.models import UserEmail
 else:
-    from sentry.models import (
-        Organization,
-        OrganizationMember,
-        UserEmail,
-        UserOption,
-    )
+    from sentry.models import Organization, OrganizationMember, UserEmail, UserOption
 
 
 def _get_effective_sentry_role(ldap_user):

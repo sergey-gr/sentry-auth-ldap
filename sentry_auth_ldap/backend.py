@@ -15,7 +15,7 @@ def compare_versions(current: str, required: str) -> bool:
     return version.parse(current) >= version.parse(required)
 
 # Import different models for backwards compatibility
-if compare_versions(sentry_version, "24.8.0"):
+if compare_versions(sentry_version, "24.10.0"):
     from sentry.models import Organization, OrganizationMember, UserOption
     from sentry.users.models import UserEmail
 else:
